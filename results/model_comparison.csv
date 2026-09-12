@@ -1,0 +1,5 @@
+Model,Dataset_Rows,Training_Rows,Testing_Rows,Feature_Count,Accuracy,Precision_Churn,Recall_Churn,F1_Churn,Weighted_F1,ROC_AUC,True_Negatives,False_Positives,False_Negatives,True_Positives,Training_Time_Seconds,Prediction_Time_Seconds,Prediction_Throughput_Rows_Per_Second
+Logistic_Regression,7032,5690,1342,45,0.821908,0.701639,0.59116,0.641679,0.816814,0.854916,889,91,148,214,7.314478,0.633417,2118.67
+Decision_Tree,7032,5690,1342,45,0.795082,0.688312,0.439227,0.536256,0.778867,0.747326,908,72,203,159,2.504221,0.35403,3790.63
+Random_Forest,7032,5690,1342,45,0.811475,0.72428,0.486188,0.581818,0.79833,0.853222,913,67,186,176,5.240351,0.49835,2692.89
+Gradient_Boosted_Tree,7032,5690,1342,45,0.802534,0.6633,0.544199,0.597876,0.795964,0.84341,880,100,165,197,13.594313,0.352729,3804.62
