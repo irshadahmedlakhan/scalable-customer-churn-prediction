@@ -1,4 +1,4 @@
-# Scalable Customer Churn Prediction Using Big Data and Machine Learning
+# Scalable Customer Churn Prediction Using Apache Spark and Machine Learning
 
 ## Overview
 
@@ -20,6 +20,8 @@ Four classification algorithms are implemented using **Apache Spark MLlib**:
 - Gradient Boosted Tree
 
 The original Telco Customer Churn dataset contains **7,043 customer records**. After data cleaning, **7,032 observations** are used for modelling.
+
+The original dataset is relatively small and is **not claimed to be a Big Data dataset**. Apache Spark is used as the data-processing and machine-learning framework to build the pipeline and to investigate computational behaviour under controlled increases in workload size.
 
 In addition to evaluating predictive performance on a held-out test set, the project investigates how model training and prediction times change as computational workload size increases.
 
@@ -70,6 +72,8 @@ The experiment combines:
 
 The purpose is not to claim that the replicated dataset becomes a genuinely larger independent customer dataset. Replication is used specifically to increase computational workload while preserving the original experimental data.
 
+The project should therefore be interpreted as a **controlled Spark-based scalability study in a local computing environment**, rather than as a demonstration of a production-scale distributed Big Data deployment.
+
 ---
 
 ## Technologies
@@ -85,7 +89,7 @@ The project uses:
 - Matplotlib
 - NumPy
 
-Spark is executed using:
+Apache Spark is a technology designed for scalable and distributed data processing. In this project, however, Spark is executed locally using:
 
 ```text
 local[2]
@@ -118,6 +122,8 @@ The target variable is binary:
 - `1` = Churn
 
 The dataset contains customer information related to services, contracts, billing, tenure, payment methods, and other customer characteristics.
+
+The dataset is suitable for demonstrating the complete Spark machine-learning workflow and for establishing the baseline predictive experiment. However, its **7,032 cleaned independent observations are not characterized as Big Data**.
 
 ### Raw Dataset Availability
 
@@ -335,6 +341,8 @@ Computational scalability is evaluated using six workload sizes.
 | 100x | 703,200 | 569,000 | 134,200 |
 
 The training and testing partitions are replicated separately so that the original train/test separation is preserved.
+
+These scaled workloads are **computational workloads only**. Increasing the number of replicated rows increases the amount of data Spark must process, but it does not introduce new independent customer information.
 
 The experiment includes Spark/JVM warm-up before measured trials.
 
@@ -808,6 +816,7 @@ For this reason, changes in predictive metrics at replicated workload sizes are 
 This project has several limitations:
 
 - The cleaned dataset contains only **7,032 independent customer observations**.
+- The original dataset is relatively small and is **not considered a Big Data dataset**.
 - Larger workloads are generated through replication and do not represent additional independent customers.
 - Replicated workloads are used only for computational scalability testing.
 - Spark is executed using `local[2]` on a single machine.
@@ -818,6 +827,8 @@ This project has several limitations:
 - No extensive hyperparameter search is performed.
 - Computational timings can be influenced by hardware, JVM state, caching, operating-system activity, and Spark scheduling.
 - Tree-based model behaviour may vary slightly when workload replication changes Spark partitioning or approximate feature-binning behaviour.
+
+These limitations mean that the project should be interpreted as a **controlled local Spark scalability experiment and machine-learning comparison**, rather than as evidence of production-scale distributed Big Data performance.
 
 ---
 
@@ -845,6 +856,8 @@ Possible future improvements include:
 
 This project demonstrates how Apache Spark MLlib can be used not only to build customer-churn prediction models but also to investigate their computational behaviour as workload size increases.
 
+The project uses a relatively small original customer dataset and therefore does **not claim that the source dataset itself constitutes Big Data**. Instead, Apache Spark provides the computational framework for implementing the machine-learning workflow and conducting controlled scalability experiments using increasing replicated workloads.
+
 Among the four evaluated classifiers, Logistic Regression provided the strongest overall balance of predictive performance and computational cost in the tested environment.
 
 On the original held-out test set, Logistic Regression achieved:
@@ -870,15 +883,17 @@ Gradient Boosted Tree: 92.9097 seconds
 
 The results demonstrate why predictive quality and computational efficiency should be considered together when evaluating machine-learning systems intended for increasing data workloads.
 
+The study provides a reproducible foundation that can be extended in future work using genuinely large independent datasets and multi-node or cloud-based Spark environments.
+
 ---
 
 ## Author
 
-**Irshad Ahmed**
+**Irshad Ahmed**  
 Nanjing University
 
-Research Project: **Scalable Customer Churn Prediction Using Big Data and Machine Learning**
+Research Project: **Scalable Customer Churn Prediction Using Apache Spark and Machine Learning**
 
 Technologies:
 
-**Python · PySpark · Apache Spark · Spark MLlib · Machine Learning · Big Data**
+**Python · PySpark · Apache Spark · Spark MLlib · Machine Learning · Scalability Analysis**
