@@ -2,29 +2,36 @@
 
 ## Overview
 
-This project investigates customer churn prediction using Apache Spark and machine learning.
+This project investigates customer churn prediction using **Apache Spark** and **machine learning**, with emphasis on both predictive performance and computational scalability.
 
-The main objective is to compare multiple machine-learning algorithms in terms of both:
+The main objective is to compare multiple machine-learning algorithms in terms of:
 
 - Predictive performance
 - Computational scalability
+- Training cost
+- Prediction cost
+- Practical suitability as workload size increases
 
-Four classification algorithms are implemented using Apache Spark MLlib:
+Four classification algorithms are implemented using **Apache Spark MLlib**:
 
 - Logistic Regression
 - Decision Tree
 - Random Forest
 - Gradient Boosted Tree
 
-The original Telco Customer Churn dataset contained 7,043 customer records. After data cleaning, 7,032 observations were used for modelling.
+The original Telco Customer Churn dataset contains **7,043 customer records**. After data cleaning, **7,032 observations** are used for modelling.
 
 In addition to evaluating predictive performance on a held-out test set, the project investigates how model training and prediction times change as computational workload size increases.
 
-Synthetic workloads ranging from 1x to 100x were created by replicating the original training and testing observations separately.
+Synthetic workloads ranging from **1x to 100x** are created by replicating the original training and testing observations separately.
 
-The largest computational workload contains 703,200 rows.
+The largest computational workload contains:
 
-> **Important:** The scaled workloads were created through replication for computational scalability testing. They do not represent 703,200 independent customers.
+```text
+703,200 rows
+```
+
+> **Important:** The scaled workloads are created through replication for computational scalability testing. They do not represent 703,200 independent customers and are not used as evidence of improved predictive generalization.
 
 ---
 
@@ -36,9 +43,32 @@ This project investigates the following research questions:
 
 **RQ2:** How do Logistic Regression, Decision Tree, Random Forest, and Gradient Boosted Tree compare in predictive performance?
 
-**RQ3:** How does increasing dataset workload size affect training and prediction time using Apache Spark?
+**RQ3:** How does increasing workload size affect training and prediction time using Apache Spark?
 
 **RQ4:** Which model provides the best balance between predictive performance and computational scalability?
+
+---
+
+## Research Contribution
+
+The project provides a controlled comparison of the predictive performance and computational scalability of four Spark MLlib classifiers for customer churn.
+
+The experiment combines:
+
+- A common preprocessing pipeline
+- A consistent train/test split
+- Four Spark MLlib classifiers
+- Held-out predictive evaluation
+- Synthetic workloads from 1x to 100x
+- Three repeated timing trials per model/workload combination
+- 72 total timing trials
+- Mean execution times
+- Timing standard deviations
+- Training throughput
+- Prediction throughput
+- Reproducible result visualizations
+
+The purpose is not to claim that the replicated dataset becomes a genuinely larger independent customer dataset. Replication is used specifically to increase computational workload while preserving the original experimental data.
 
 ---
 
@@ -52,24 +82,24 @@ The project uses:
 - Spark MLlib
 - Spark SQL
 - Parquet
-- NumPy
 - Matplotlib
+- NumPy
 
-Spark was executed using:
+Spark is executed using:
 
 ```text
 local[2]
 ```
 
-This configuration provides two local execution threads.
+This configuration provides two local Spark execution threads.
 
-Therefore, the scalability results represent local Spark parallel workload behaviour on a single machine rather than multi-node cluster scalability.
+Therefore, the scalability results represent **local parallel Spark workload behaviour on a single machine**, rather than multi-node distributed-cluster scalability.
 
 ---
 
 ## Dataset
 
-The project uses the Telco Customer Churn dataset.
+The project uses the **Telco Customer Churn** dataset.
 
 After preprocessing:
 
@@ -87,7 +117,19 @@ The target variable is binary:
 - `0` = No Churn
 - `1` = Churn
 
-The dataset contains customer information related to services, contracts, billing, tenure, and other customer characteristics.
+The dataset contains customer information related to services, contracts, billing, tenure, payment methods, and other customer characteristics.
+
+### Raw Dataset Availability
+
+The raw dataset is **not committed to this repository**.
+
+Place the dataset locally at:
+
+```text
+data/Telco-Customer-Churn.csv
+```
+
+This keeps third-party raw data separate from the source code and generated experimental results.
 
 ---
 
@@ -107,7 +149,7 @@ The preprocessing pipeline includes:
 8. Converting the churn target into a numeric label
 9. Saving the processed dataset in Parquet format
 
-The final processed dataset contains a Spark ML feature vector with 45 features.
+The final processed dataset contains a Spark ML feature vector with **45 features**.
 
 Using Parquet allows the Spark feature-vector representation to be preserved and loaded directly during model training.
 
@@ -157,7 +199,7 @@ seed = 42
 
 ## Train/Test Design
 
-The cleaned dataset was divided into training and testing partitions using an approximately 80/20 split with seed 42.
+The cleaned dataset is divided into training and testing partitions using an approximately 80/20 split with seed `42`.
 
 | Split | Rows | Percentage |
 |---|---:|---:|
@@ -165,9 +207,9 @@ The cleaned dataset was divided into training and testing partitions using an ap
 | Testing | 1,342 | 19.08% |
 | Total | 7,032 | 100% |
 
-Predictive conclusions are based on the held-out test set.
+Predictive conclusions are based on the **held-out test set**.
 
-The training and testing partitions were kept separate during the scalability experiment.
+The training and testing partitions remain separate during the scalability experiment.
 
 ---
 
@@ -187,19 +229,20 @@ Predictive performance is evaluated using:
 
 ### Computational Performance
 
-Computational performance is evaluated using:
+Computational scalability is evaluated using:
 
 - Training time
 - Prediction time
 - Training throughput
 - Prediction throughput
-- Timing standard deviation
+- Mean execution time
+- Sample standard deviation across repeated trials
 
 ---
 
-## Baseline Predictive Results
+# Baseline Predictive Results
 
-The four models were evaluated on the same held-out test set.
+The four models are evaluated on the same held-out test set.
 
 | Model | Accuracy | Churn Precision | Churn Recall | Churn F1 | Weighted F1 | ROC-AUC |
 |---|---:|---:|---:|---:|---:|---:|
@@ -218,7 +261,31 @@ Its main results were:
 - Churn recall: **59.12%**
 - Churn precision: **70.16%**
 
-Random Forest achieved the highest churn precision at **72.43%**.
+Random Forest achieved the highest churn precision:
+
+```text
+72.43%
+```
+
+---
+
+## Baseline Predictive Visualizations
+
+### Overall Predictive Metrics
+
+![Baseline Predictive Metrics Comparison](results/figures/baseline_predictive_metrics_comparison.png)
+
+### Accuracy Comparison
+
+![Model Accuracy Comparison](results/figures/model_accuracy_comparison.png)
+
+### ROC-AUC Comparison
+
+![Model AUC Comparison](results/figures/model_auc_comparison.png)
+
+### Churn-Class F1 Comparison
+
+![Churn F1 Comparison](results/figures/churn_f1_comparison.png)
 
 ---
 
@@ -254,19 +321,9 @@ Random Forest achieved the highest churn precision at **72.43%**.
 
 ---
 
-## Baseline Computational Results
+# Scalability Experiment
 
-The baseline training run also recorded execution times for the four models.
-
-These values represent a single execution and can vary between runs depending on JVM state, caching, operating-system activity, and other runtime conditions.
-
-The repeated scalability experiment below is therefore used as the stronger computational comparison.
-
----
-
-## Scalability Experiment
-
-Computational scalability was evaluated using six workload sizes.
+Computational scalability is evaluated using six workload sizes.
 
 | Scale | Total Rows | Training Rows | Testing Rows |
 |---|---:|---:|---:|
@@ -277,103 +334,192 @@ Computational scalability was evaluated using six workload sizes.
 | 50x | 351,600 | 284,500 | 67,100 |
 | 100x | 703,200 | 569,000 | 134,200 |
 
-The training and testing partitions were replicated separately so that the original train/test separation was preserved.
+The training and testing partitions are replicated separately so that the original train/test separation is preserved.
 
-The experiment included Spark/JVM warm-up before the measured trials.
+The experiment includes Spark/JVM warm-up before measured trials.
 
-Each model and workload-size combination was measured three times.
+Each model/workload combination is measured three times.
 
-The complete experiment therefore contained:
+The complete benchmark therefore contains:
 
 ```text
 6 workload sizes × 4 models × 3 trials = 72 timing trials
 ```
 
-This produced 24 model/workload summaries.
+Mean execution time and sample standard deviation are calculated from the repeated measurements.
 
-Mean execution time and sample standard deviation were calculated from the repeated measurements.
-
-The scalability experiment also supports checkpointing and resuming. Successful trials are temporarily saved during execution so that completed work is not lost if a long-running Spark/JVM process terminates unexpectedly.
+The scalability script also supports checkpointed experiment output so completed trials can be preserved during longer benchmark runs.
 
 ---
 
-## Largest Workload Comparison
+## Mean Training-Time Scalability
 
-At the 100x workload, the experiment processed:
+Mean training times from the repeated benchmark are:
 
-- **569,000 training rows**
-- **134,200 testing rows**
-- **703,200 total workload rows**
+| Scale | Logistic Regression | Decision Tree | Random Forest | Gradient Boosted Tree |
+|---|---:|---:|---:|---:|
+| 1x | 4.8468 | 1.2778 | 4.0490 | 10.5372 |
+| 5x | 4.5068 | 1.3542 | 11.5498 | 20.4117 |
+| 10x | 4.7918 | 2.7332 | 16.7450 | 17.8584 |
+| 20x | 6.6230 | 3.1980 | 20.3389 | 20.3304 |
+| 50x | 8.8667 | 7.0727 | 36.6863 | 50.4437 |
+| 100x | 16.5364 | 16.1523 | 76.2010 | 92.9097 |
 
-The final repeated results at this workload were:
+At larger workloads, Random Forest and Gradient Boosted Tree require substantially more training time than Logistic Regression.
 
-| Model | Accuracy | ROC-AUC | Mean Training Time (s) | Training SD (s) | Mean Prediction Time (s) |
-|---|---:|---:|---:|---:|---:|
-| Logistic Regression | 0.8219 | 0.8549 | 16.5364 | 1.8987 | 0.5039 |
-| Decision Tree | 0.7936 | 0.7455 | 16.1523 | 1.9169 | 0.6754 |
-| Random Forest | 0.8145 | 0.8529 | 76.2010 | 13.5178 | 2.2469 |
-| Gradient Boosted Tree | 0.8137 | 0.8450 | 92.9097 | 11.4308 | 1.4822 |
+### Training-Time Scalability
 
-At the largest workload, Logistic Regression maintained strong predictive performance while requiring substantially less training time than Random Forest and Gradient Boosted Tree.
+![Training Time Scalability](results/figures/training_time_scalability.png)
 
-Decision Tree had a similar mean training time to Logistic Regression at 100x, but its predictive performance was weaker.
+### Training Time with Error Bars
 
-The predictive metrics reported for replicated workloads are treated only as consistency checks. They are not interpreted as evidence of improved predictive generalization because the additional rows are replicated observations.
+![Training Time with Error Bars](results/figures/training_time_with_error_bars.png)
 
 ---
 
-## Main Finding
+## Mean Prediction-Time Scalability
 
-The experiments indicate that **Logistic Regression provides the best overall balance between predictive performance and computational scalability** among the four models tested in this project.
+Mean prediction times from the repeated benchmark are:
+
+| Scale | Logistic Regression | Decision Tree | Random Forest | Gradient Boosted Tree |
+|---|---:|---:|---:|---:|
+| 1x | 0.3281 | 0.3808 | 0.3815 | 0.2452 |
+| 5x | 0.2104 | 0.1994 | 0.6434 | 0.4039 |
+| 10x | 0.2095 | 0.2464 | 0.7488 | 0.3605 |
+| 20x | 0.2358 | 0.2829 | 0.8623 | 0.3610 |
+| 50x | 0.3076 | 0.3597 | 1.2891 | 0.7947 |
+| 100x | 0.5039 | 0.6754 | 2.2469 | 1.4822 |
+
+Prediction time generally increases as workload size becomes larger.
+
+Small-scale measurements are not perfectly monotonic because JVM warm-up, Spark scheduling, caching, task-startup overhead, and normal operating-system variability have greater influence when individual jobs are small.
+
+### Prediction-Time Scalability
+
+![Prediction Time Scalability](results/figures/prediction_time_scalability.png)
+
+### Prediction Time with Error Bars
+
+![Prediction Time with Error Bars](results/figures/prediction_time_with_error_bars.png)
+
+---
+
+## Throughput Analysis
+
+Execution time alone does not fully describe computational behaviour.
+
+Training and prediction throughput are also calculated to show how many rows are processed per second at different workload sizes.
+
+### Training Throughput
+
+![Training Throughput Scalability](results/figures/training_throughput_scalability.png)
+
+### Prediction Throughput
+
+![Prediction Throughput Scalability](results/figures/prediction_throughput_scalability.png)
+
+---
+
+# Largest Workload Comparison
+
+At the **100x workload**, corresponding to 703,200 total replicated rows:
+
+| Model | Accuracy | ROC-AUC | Mean Training Time (s) | Training SD (s) | Mean Prediction Time (s) | Prediction SD (s) |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.8219 | 0.8549 | 16.5364 | 1.8987 | 0.5039 | 0.0344 |
+| Decision Tree | 0.7936 | 0.7455 | 16.1523 | 1.9169 | 0.6754 | 0.0289 |
+| Random Forest | 0.8145 | 0.8529 | 76.2010 | 13.5178 | 2.2469 | 0.1982 |
+| Gradient Boosted Tree | 0.8137 | 0.8450 | 92.9097 | 11.4308 | 1.4822 | 0.2572 |
+
+At 100x:
+
+- Logistic Regression training: **16.54 seconds**
+- Decision Tree training: **16.15 seconds**
+- Random Forest training: **76.20 seconds**
+- Gradient Boosted Tree training: **92.91 seconds**
+
+Compared with Logistic Regression:
+
+- Random Forest required approximately **4.61x** as much mean training time.
+- Gradient Boosted Tree required approximately **5.62x** as much mean training time.
+
+The predictive metrics reported at replicated workloads are treated only as consistency checks.
+
+They are **not interpreted as evidence that predictive performance improves with additional replicated rows**, because those rows are copies of existing observations rather than new independent customers.
+
+### 100x Training-Time Comparison
+
+![100x Training Time Comparison](results/figures/100x_training_time_comparison.png)
+
+### 100x Prediction-Time Comparison
+
+![100x Prediction Time Comparison](results/figures/100x_prediction_time_comparison.png)
+
+---
+
+# Main Finding
+
+The experiments indicate that **Logistic Regression provides the strongest overall balance between predictive performance and computational scalability** among the four models tested in this project.
 
 Logistic Regression achieved the highest baseline:
 
 - Accuracy
-- Churn-class F1
-- Weighted F1
+- Churn-class F1 score
+- Weighted F1 score
 - ROC-AUC
 
-Random Forest achieved the highest churn-class precision and a similar ROC-AUC, but required considerably more training time as workload size increased.
+It also maintained substantially lower training cost than Random Forest and Gradient Boosted Tree at the largest synthetic workload.
 
-At the 100x workload, Logistic Regression required approximately **16.54 seconds** of mean training time compared with approximately **76.20 seconds** for Random Forest and **92.91 seconds** for Gradient Boosted Tree.
+Random Forest achieved a similar ROC-AUC but required considerably more training time as workload size increased.
 
-These findings apply to the experimental environment used in this project. They should not be interpreted as evidence that Logistic Regression will always outperform the other models on different datasets, hardware configurations, or distributed environments.
+Gradient Boosted Tree also provided competitive predictive performance but showed the highest mean training cost at the largest workload.
+
+Decision Tree was computationally inexpensive at smaller workloads but produced weaker predictive results, particularly in ROC-AUC and churn recall.
+
+These findings apply specifically to the experimental environment used in this project.
+
+They should not be interpreted as evidence that Logistic Regression will always outperform other models on different datasets, hardware configurations, Spark clusters, or modelling tasks.
 
 ---
 
-## Generated Visualizations
+# Result Figures
 
-The visualization pipeline generates 14 research figures:
-
-1. Baseline predictive metrics comparison
-2. Model accuracy comparison
-3. Model ROC-AUC comparison
-4. Churn-class F1 comparison
-5. Baseline training-time comparison
-6. Baseline prediction-time comparison
-7. Training-time scalability
-8. Training-time scalability with standard-deviation error bars
-9. Prediction-time scalability
-10. Prediction-time scalability with standard-deviation error bars
-11. Training-throughput scalability
-12. Prediction-throughput scalability
-13. 100x training-time comparison
-14. 100x prediction-time comparison
-
-The generated figures are stored in:
+The visualization pipeline generates **14 result figures**:
 
 ```text
 results/figures/
+│
+├── baseline_predictive_metrics_comparison.png
+├── model_accuracy_comparison.png
+├── model_auc_comparison.png
+├── churn_f1_comparison.png
+├── baseline_training_time_comparison.png
+├── baseline_prediction_time_comparison.png
+├── training_time_scalability.png
+├── training_time_with_error_bars.png
+├── prediction_time_scalability.png
+├── prediction_time_with_error_bars.png
+├── training_throughput_scalability.png
+├── prediction_throughput_scalability.png
+├── 100x_training_time_comparison.png
+└── 100x_prediction_time_comparison.png
 ```
+
+The most important figures are displayed directly in this README, while all generated figures are available in the `results/figures/` directory.
 
 ---
 
-## Project Structure
+# Project Structure
 
 ```text
 Scalable_ML_Big_Data_Project/
 │
+├── README.md
+├── requirements.txt
+├── .gitignore
+│
 ├── data/
+│   ├── .gitkeep
 │   ├── Telco-Customer-Churn.csv
 │   └── processed/
 │       └── churn_data.parquet/
@@ -384,6 +530,8 @@ Scalable_ML_Big_Data_Project/
 │   ├── Random_Forest/
 │   └── Gradient_Boosted_Tree/
 │
+├── predictions/
+│
 ├── results/
 │   ├── model_comparison.csv
 │   ├── scalability_trials.csv
@@ -391,34 +539,44 @@ Scalable_ML_Big_Data_Project/
 │   ├── churn_predictions/
 │   └── figures/
 │
-├── src/
-│   ├── load_data.py
-│   ├── data_preprocessing.py
-│   ├── train_model.py
-│   ├── predict.py
-│   ├── scalability_experiment.py
-│   └── visualize_results.py
-│
-├── README.md
-├── requirements.txt
-└── .gitignore
+└── src/
+    ├── load_data.py
+    ├── data_preprocessing.py
+    ├── train_model.py
+    ├── predict.py
+    ├── scalability_experiment.py
+    └── visualize_results.py
 ```
 
-Generated Python `__pycache__/` directories are excluded from version control through `.gitignore`.
+Generated datasets, trained models, prediction outputs, and other large or reproducible artifacts are excluded from version control where appropriate.
 
 ---
 
-## Installation
+# Installation
 
-Python 3 and a Java runtime compatible with the installed PySpark version are required.
+## 1. Clone the Repository
 
-Install the Python dependencies from the project root:
+```bash
+git clone https://github.com/irshadahmedlakhan/scalable-customer-churn-prediction.git
+```
+
+Move into the project directory:
+
+```bash
+cd scalable-customer-churn-prediction
+```
+
+---
+
+## 2. Install Python Dependencies
+
+Install the required packages using:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The current `requirements.txt` contains:
+The project requirements are:
 
 ```text
 pyspark
@@ -426,92 +584,138 @@ matplotlib
 numpy
 ```
 
+Apache Spark also requires a compatible Java installation.
+
 ---
 
-## How to Run the Project
+# How to Run the Project
 
-Run the following commands from the project root.
+Run the commands below from the project root directory.
 
-### 1. Inspect the Raw Dataset
+## 1. Prepare the Dataset
 
-Place the Telco Customer Churn CSV file at:
+Place the raw Telco Customer Churn CSV file at:
 
 ```text
 data/Telco-Customer-Churn.csv
 ```
 
-Then optionally inspect the dataset using:
+---
+
+## 2. Inspect the Raw Dataset
+
+Run:
 
 ```bash
 python src/load_data.py
 ```
 
-### 2. Run Data Preprocessing
+This loads the raw CSV file using Spark and provides basic dataset inspection.
+
+---
+
+## 3. Run Data Preprocessing
+
+Run:
 
 ```bash
 python src/data_preprocessing.py
 ```
 
-This cleans and transforms the raw data and creates:
+This:
+
+- Cleans the dataset
+- Encodes categorical variables
+- Creates the feature vector
+- Creates the binary churn label
+- Saves the processed Spark dataset as Parquet
+
+The generated processed data is stored locally under:
 
 ```text
-data/processed/churn_data.parquet/
+data/processed/
 ```
 
-### 3. Train and Evaluate the Models
+---
+
+## 4. Train and Evaluate the Models
+
+Run:
 
 ```bash
 python src/train_model.py
 ```
 
-This trains all four classifiers, evaluates them using the held-out test set, saves the trained models, and creates:
+This script:
 
-```text
-results/model_comparison.csv
-```
+- Loads the processed dataset
+- Creates the train/test split
+- Trains all four classifiers
+- Evaluates them on the held-out test set
+- Calculates predictive metrics
+- Saves trained Spark models
+- Saves the model-comparison results
 
-### 4. Generate Churn Predictions
+Model evaluation is performed directly inside `train_model.py`.
+
+---
+
+## 5. Generate Churn Predictions
+
+Run:
 
 ```bash
 python src/predict.py
 ```
 
-The prediction script loads the selected trained model and applies it to the processed dataset.
+This demonstrates inference using a trained Spark model and produces churn predictions.
 
-The resulting predictions are written to:
+> The prediction output is an inference demonstration. It is not used as a replacement for held-out test-set evaluation.
 
-```text
-results/churn_predictions/
-```
+---
 
-The prediction output is intended as an inference demonstration. Predictive performance conclusions are based on the held-out test evaluation performed by `train_model.py`.
+## 6. Run the Scalability Experiment
 
-### 5. Run the Scalability Experiment
+Run:
 
 ```bash
 python src/scalability_experiment.py
 ```
 
-This performs the repeated benchmark across all six workload sizes and four algorithms.
-
-A complete run contains 72 measured trials.
-
-During a run, temporary checkpoint CSV files may be created so that an interrupted experiment can be resumed.
-
-After successful completion, the final results are written to:
+This performs repeated computational benchmarking across:
 
 ```text
-results/scalability_trials.csv
-results/scalability_repeated_results.csv
+1x
+5x
+10x
+20x
+50x
+100x
 ```
 
-### 6. Generate Visualizations
+For every workload size, each of the four models is measured three times.
+
+The full benchmark contains:
+
+```text
+72 timing trials
+```
+
+The experiment records raw trials as well as aggregated mean and standard-deviation results.
+
+Because the benchmark can take considerably longer than the baseline training run, intermediate/checkpoint results are used to reduce the risk of losing completed measurements if execution is interrupted.
+
+---
+
+## 7. Generate Visualizations
+
+Run:
 
 ```bash
 python src/visualize_results.py
 ```
 
-This reads the baseline and repeated scalability results and generates all 14 figures in:
+The script generates 14 figures and stores them in:
 
 ```text
 results/figures/
@@ -519,75 +723,162 @@ results/figures/
 
 ---
 
-## Generated Outputs
+# Generated Outputs
 
 Important experiment outputs include:
 
-- `results/model_comparison.csv` — held-out baseline model comparison
-- `results/scalability_trials.csv` — raw repeated timing trials
-- `results/scalability_repeated_results.csv` — aggregated scalability results
-- `results/figures/` — generated research visualizations
-- `results/churn_predictions/` — generated churn predictions
-- `models/` — saved Spark MLlib models
-- `data/processed/churn_data.parquet/` — processed Spark dataset
+```text
+results/model_comparison.csv
+results/scalability_trials.csv
+results/scalability_repeated_results.csv
+results/figures/
+```
 
-Some generated artifacts may be excluded from Git version control because they can be reproduced by running the source code.
+Other generated artifacts include:
 
----
+```text
+data/processed/
+models/
+predictions/
+results/churn_predictions/
+```
 
-## Reproducibility Notes
-
-The project uses:
-
-- A fixed train/test split seed of `42`
-- Fixed model configurations
-- The same base training and testing partitions across scalability workloads
-- Three measured trials for each model/workload combination
-- Spark/JVM warm-up before measured scalability trials
-- Mean and sample standard deviation for repeated timing measurements
-
-Computational timing results are environment-dependent. Exact execution times may differ across machines or across repeated executions on the same machine.
+Some generated artifacts are intentionally ignored by Git because they can be reproduced by running the project scripts.
 
 ---
 
-## Limitations
+# Reproducibility
+
+Several measures are used to improve experiment reproducibility:
+
+- A fixed random seed of `42` is used where applicable.
+- All four classifiers use the same preprocessing pipeline.
+- Models are evaluated using the same held-out test set.
+- Training and testing partitions remain separate during workload replication.
+- Scalability timing measurements are repeated three times.
+- Mean and sample standard deviation are reported instead of relying on a single timing measurement.
+- Raw timing trials are preserved in `scalability_trials.csv`.
+- Aggregated timing results are preserved in `scalability_repeated_results.csv`.
+- Result visualizations are generated programmatically.
+- Project paths are resolved relative to the source files rather than relying on a fixed absolute project directory.
+
+Computational timings may still vary between machines because of differences in:
+
+- Processor performance
+- Available memory
+- Java/JVM state
+- Spark version
+- Operating-system activity
+- Disk performance
+- Background applications
+- Spark scheduling behaviour
+
+---
+
+# Interpretation of Scalability Results
+
+This project distinguishes between two different questions:
+
+### Predictive Evaluation
+
+Predictive evaluation asks:
+
+> How well does a trained model generalize to held-out customer observations?
+
+This is answered using the original held-out test partition.
+
+### Computational Scalability
+
+The scalability experiment asks:
+
+> How does Spark computational cost change when the amount of data processed by the model increases?
+
+This is investigated using replicated workloads.
+
+These two objectives should not be confused.
+
+Replication increases the amount of computation but **does not create new independent information**.
+
+For this reason, changes in predictive metrics at replicated workload sizes are not interpreted as evidence that larger replicated datasets improve generalization.
+
+---
+
+# Limitations
 
 This project has several limitations:
 
-- The cleaned dataset contains only 7,032 independent customer observations.
-- Larger workloads were generated through replication and do not represent additional independent customers.
-- The replicated workloads were created only for computational scalability testing.
-- Spark was executed using `local[2]` on a single machine.
+- The cleaned dataset contains only **7,032 independent customer observations**.
+- Larger workloads are generated through replication and do not represent additional independent customers.
+- Replicated workloads are used only for computational scalability testing.
+- Spark is executed using `local[2]` on a single machine.
 - The experiment therefore does not demonstrate multi-node cluster scalability.
-- Only four machine-learning algorithms were evaluated.
-- Fixed hyperparameter configurations were used.
-- No dedicated class-balancing technique was evaluated.
-- Computational timings can be affected by hardware, JVM state, caching, operating-system activity, and Spark scheduling.
+- Only four machine-learning algorithms are evaluated.
+- Fixed hyperparameter configurations are used.
+- No dedicated class-balancing technique is evaluated.
+- No extensive hyperparameter search is performed.
+- Computational timings can be influenced by hardware, JVM state, caching, operating-system activity, and Spark scheduling.
+- Tree-based model behaviour may vary slightly when workload replication changes Spark partitioning or approximate feature-binning behaviour.
 
 ---
 
-## Future Work
+# Future Work
 
 Possible future improvements include:
 
-- Testing on genuinely large datasets containing independent observations
-- Running the experiments on a multi-node Spark cluster
+- Testing genuinely large datasets containing independent observations
+- Running the experiment on a multi-node Spark cluster
+- Using cloud-based Spark environments
 - Performing systematic hyperparameter optimization
 - Applying cross-validation
 - Investigating class weighting and resampling
 - Performing classification-threshold optimization to improve churn recall
-- Adding feature-importance and model-interpretability analysis
-- Measuring memory consumption and end-to-end pipeline latency
+- Adding feature-importance analysis
+- Adding model-interpretability methods
+- Measuring memory consumption
+- Measuring end-to-end pipeline latency
 - Comparing Spark MLlib with additional scalable machine-learning frameworks
+- Evaluating the workflow using datasets containing millions of independent records
+
+---
+
+# Conclusion
+
+This project demonstrates how Apache Spark MLlib can be used not only to build customer-churn prediction models but also to investigate their computational behaviour as workload size increases.
+
+Among the four evaluated classifiers, Logistic Regression provided the strongest overall balance of predictive performance and computational cost in the tested environment.
+
+On the original held-out test set, Logistic Regression achieved:
+
+```text
+Accuracy: 0.8219
+ROC-AUC: 0.8549
+Churn F1: 0.6417
+```
+
+At the 100x workload, its mean training time was:
+
+```text
+16.5364 seconds
+```
+
+compared with:
+
+```text
+Random Forest:         76.2010 seconds
+Gradient Boosted Tree: 92.9097 seconds
+```
+
+The results demonstrate why predictive quality and computational efficiency should be considered together when evaluating machine-learning systems intended for increasing data workloads.
 
 ---
 
 ## Author
 
 **Irshad Ahmed**
+Nanjing University
 
-Research Project:
+Research Project: **Scalable Customer Churn Prediction Using Big Data and Machine Learning**
 
-**Scalable Customer Churn Prediction Using Big Data and Machine Learning**
+Technologies:
 
-Technologies: Python, PySpark, Apache Spark MLlib, NumPy, Matplotlib
+**Python · PySpark · Apache Spark · Spark MLlib · Machine Learning · Big Data**
